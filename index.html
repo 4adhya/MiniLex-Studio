@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="MiniLex Studio — an interactive lexical analyzer playground.">
+  <title>MiniLex Studio | Lexical Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">M</span><span>minilex<span class="brand-muted">.studio</span></span></a>
+      <div class="side-label">WORKSPACE</div>
+      <button class="nav-item active"><span>⌘</span> Lexer Playground</button>
+      <button class="nav-item" id="rulesNav"><span>⌗</span> Token Rules</button>
+      <div class="side-label second">QUICK START</div>
+      <button class="sample-link" data-sample="basic"><i></i> Basic arithmetic</button>
+      <button class="sample-link" data-sample="clike"><i></i> C-like program</button>
+      <button class="sample-link" data-sample="errors"><i></i> Invalid characters</button>
+      <div class="sidebar-bottom">
+        <div class="status-dot"></div><span>Lexer engine ready</span>
+        <small>v1.0.0 · C++17 concepts</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><div class="eyebrow">COMPILER DESIGN TOOLKIT</div><h1>Lexer Playground</h1></div>
+        <div class="top-actions"><span class="pill"><b></b> Engine online</span><button class="ghost-btn" id="resetBtn">↺ Reset</button><button class="run-btn" id="analyzeBtn">▶ &nbsp;Analyze code</button></div>
+      </header>
+
+      <section class="intro">
+        <div><h2>Turn source code into tokens.</h2><p>Write a snippet, run the scanner, and inspect how a lexical analyzer sees your code.</p></div>
+        <div class="intro-tag">LONGEST MATCH <span>·</span> RULE-BASED SCANNING</div>
+      </section>
+
+      <section class="workspace">
+        <div class="panel editor-panel">
+          <div class="panel-head"><div><span class="panel-icon purple">⌁</span><strong>Source code</strong><span class="file-tag">main.c</span></div><span class="subtle">INPUT</span></div>
+          <div class="editor-wrap"><div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7</div><textarea id="sourceCode" spellcheck="false" aria-label="Source code editor">int main() {
+    int total = 24;
+    float rate = 3.5;
+    total = total + rate;
+    if (total >= 20) {
+        return total;
+    }
+}</textarea></div>
+          <div class="editor-foot"><span><span class="green-dot"></span> Ready to scan</span><span id="charCount">0 characters</span></div>
+        </div>
+        <div class="panel rules-panel" id="rulesPanel">
+          <div class="panel-head"><div><span class="panel-icon orange">⌗</span><strong>Active token rules</strong></div><button class="text-btn" id="showRules">View all ↗</button></div>
+          <div class="rule-list">
+            <div><span class="rule-swatch kw"></span><b>KEYWORD</b><code>int | float | if | return</code></div>
+            <div><span class="rule-swatch id"></span><b>IDENTIFIER</b><code>[A-Za-z_][A-Za-z0-9_]*</code></div>
+            <div><span class="rule-swatch num"></span><b>NUMBER</b><code>[0-9]+(.[0-9]+)?</code></div>
+            <div><span class="rule-swatch op"></span><b>OPERATOR</b><code>+ - * / = == &lt;= ...</code></div>
+            <div><span class="rule-swatch sym"></span><b>SYMBOL</b><code>( ) { } ; ,</code></div>
+            <div><span class="rule-swatch skip"></span><b>WHITESPACE</b><code>spaces · tabs · newlines</code></div>
+          </div>
+          <div class="rule-note"><span>✦</span> Longest matching token wins. Ties follow rule priority.</div>
+        </div>
+      </section>
+
+      <section class="results-section">
+        <div class="results-heading"><div><div class="eyebrow">SCAN OUTPUT</div><h2>Analysis results</h2></div><div class="result-actions"><button class="ghost-btn" id="copyBtn">▣ Copy tokens</button><button class="ghost-btn" id="downloadBtn">↓ Export CSV</button></div></div>
+        <div class="stats-grid">
+          <div class="stat-card"><span>Total tokens</span><strong id="totalStat">—</strong><small>Recognized lexemes</small></div>
+          <div class="stat-card"><span>Unique types</span><strong id="typesStat">—</strong><small>Token categories</small></div>
+          <div class="stat-card"><span>Lines scanned</span><strong id="linesStat">—</strong><small>Source lines</small></div>
+          <div class="stat-card"><span>Lexical errors</span><strong id="errorsStat">—</strong><small id="errorCaption">Invalid characters</small></div>
+        </div>
+        <div class="panel token-panel">
+          <div class="panel-head token-head"><div><span class="panel-icon teal">▤</span><strong>Token stream</strong><span class="count-chip" id="tokenCount">0 tokens</span></div><select id="filterType" aria-label="Filter token type"><option value="ALL">All token types</option></select></div>
+          <div class="table-scroll"><table><thead><tr><th>#</th><th>LEXEME</th><th>TOKEN TYPE</th><th>LINE</th><th>COLUMN</th></tr></thead><tbody id="tokenBody"><tr><td colspan="5" class="empty-state">Run analysis to see your token stream.</td></tr></tbody></table></div>
+          <div class="table-foot"><span id="tableFoot">Waiting for input</span><span>MINILEX SCANNER <b>●</b></span></div>
+        </div>
+      </section>
+      <footer>Built for learning compiler design <span>MINILEX STUDIO · 2026</span></footer>
+    </main>
+  </div>
+  <div class="modal-backdrop" id="rulesModal"><div class="modal"><div class="modal-top"><div><div class="eyebrow">REFERENCE</div><h2>Lexer rule set</h2></div><button id="closeModal" class="close-btn">×</button></div><p>Rules are evaluated from left to right. The scanner selects the longest valid match at each source position.</p><div class="modal-rules" id="modalRules"></div><div class="modal-bottom">Whitespace and comments are consumed without producing tokens.</div></div></div>
+  <script src="src/app.js"></script>
+</body></html>
